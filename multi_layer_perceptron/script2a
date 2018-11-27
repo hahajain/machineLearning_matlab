@@ -1,0 +1,31 @@
+clc
+clear all
+
+H = [3,6,9,12,15,18];
+
+error_train = zeros(1,size(H,2));
+error_valid = zeros(1,size(H,2));
+W=zeros(1,size(H,2));
+V=zeros(1,size(H,2));
+
+for h = 1:size(H,2)
+    fprintf('Training for H = %d hidden units. \n',H(h));
+    [z,w,v,et,ev] = mlptrain('optdigits_train.txt', 'optdigits_valid.txt', H(h), 10);
+    error_train(h) = et;
+    error_valid(h) = ev;
+   
+end
+
+[err_train,ind_train]=min(error_train);
+[err_valid,ind_valid]=min(error_train);
+
+figure
+p1 = plot(H, error_train);
+hold on
+p2 = plot(H, error_valid);
+legend('training error','validation error');
+
+fprintf("Lowest error rate for training data %d for %d no. of hidden units \n",err_train,H(ind_train));
+fprintf("Lowest error rate for validation data %d for %d no. of hidden units \n",err_valid,H(ind_valid));
+
+[z_test] = mlptest('optdigits_test.txt',w,v);
