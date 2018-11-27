@@ -1,0 +1,53 @@
+train_data = load('optdigits_train.txt');
+valid_data = load('optdigits_valid.txt');
+
+k=H(ind_valid);
+
+data = [train_data;valid_data];
+
+[m,n]=size(data);
+train_data = [ones(m,1) data(:,1:n-1)];
+zv = zeros(k, m);
+
+for t=1:m
+        z=w*train_data(t,:)';  
+        z=max(z,0);
+        zv(:,t)=z;
+end
+
+zv=zv';
+eigenvectors = pca(zv);
+a=zv*eigenvectors(:,1:2);
+b=log(abs(a));
+b(a<0)=-b(a<0);
+proj_train =[b data(:,n)];
+
+dx = 0.1; dy = 0.1;
+    figure
+    
+    scatter(proj_train(:,1),proj_train(:,2),10,proj_train(:,3),'filled');
+    title('Combined Data projected along 2 principal components');
+    for i = 0:size(unique(data(:,n)),1)-1
+        classi = proj_train(proj_train(:,3)==i,1:2);
+        rand_index = randsample(1:length(classi),6);
+        cprint = classi(rand_index,:);
+        text(cprint(:,1)+dx, cprint(:,2)+dy, string(i));
+    end
+
+    
+a=zv*eigenvectors(:,1:3);
+b=log(abs(a));
+b(a<0)=-b(a<0);   
+proj_train =[b data(:,n)];
+dz = 0.1;
+    
+    figure
+    
+    scatter3(proj_train(:,1),proj_train(:,2),proj_train(:,3),10,proj_train(:,3),'filled');
+    title('Combined Data projected along 3 principal components');
+    for i = 0:size(unique(data(:,n)),1)-1
+        classi = proj_train(proj_train(:,4)==i,1:3);
+        rand_index = randsample(1:length(classi),6);
+        cprint = classi(rand_index,:);
+        text(cprint(:,1)+dx, cprint(:,2)+dy,cprint(:,2)+dz, string(i));
+    end
